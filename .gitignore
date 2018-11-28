@@ -26,6 +26,17 @@
 *.a
 *.lib
 
+# others
+*.suo
+*.VC.db
+*.ipch
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+pch.cpp
+pch.h
+
 # Executables
 *.exe
 *.out
