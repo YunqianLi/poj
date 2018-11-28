@@ -26,6 +26,11 @@
 *.a
 *.lib
 
+# Executables
+*.exe
+*.out
+*.app
+
 # others
 *.suo
 *.VC.db
@@ -36,8 +41,3 @@
 *.vcxproj.user
 pch.cpp
 pch.h
-
-# Executables
-*.exe
-*.out
-*.app
