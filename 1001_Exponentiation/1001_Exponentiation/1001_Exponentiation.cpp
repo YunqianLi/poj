@@ -17,6 +17,9 @@ struct DATA_t {
 
 int main()
 {
+
+
+
 	vector<DATA_t > data;
 	getData(data);
 	procData(data);
@@ -34,7 +37,7 @@ void getData( vector<DATA_t > & data )
 
 void procData(vector<DATA_t> & data)
 {
-	;
+	
 	for(vector<DATA_t >::iterator iter; iter)
 }
 
