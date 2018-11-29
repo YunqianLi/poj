@@ -41,3 +41,4 @@
 *.vcxproj.user
 pch.cpp
 pch.h
+.vs
