@@ -18,42 +18,100 @@ using namespace std;
 #define INFO(str) 
 #endif
 
-/* Define data tpye according to input data */
-struct BIG_DATA_t {
-	string	_int;// integer part of input data
-	string	_frac;// fractional part of input data
-	int		_n;// the exponentiation number, belong to (0, 25]
+/* Define input and ouput data tpye */
+struct INPUT_DATA_t {
+	string	data;       // the big data without decimal point "."
+	int     fracNum;	// the number of the fraction part
+	int		times;		// the exponentiation number, belong to (0, 25]
+};
+struct OUTPUT_DATA_t {
+	string  data;		// the big data without decimal point "."
+	int		fracNum;	// the number of the fraction part
 };
 
+
 /* Get input data and split into integer and fractional parts */
-void getData(vector<BIG_DATA_t > & big_data)
+void getData(vector<INPUT_DATA_t > & input_data)
 {
-	string str;
-	unsigned int str_int;
-	unsigned int str_frac;
-	int n;
-	while (cin >> str >> n)// get input data
+	string data;
+	int times;
+	while (cin >> data >> times)// get input data
 	{
-		INFO("input data : " << str << ", " << n);
-		BIG_DATA_t tmp;
-		int length = strlen(str.c_str());
-		sscanf(str.c_str(), "%d.%d", &str_int, &str_frac);// split str into two parts
-		INFO(str_int);
-		INFO(str_frac);
-		tmp._int = to_string(str_int);
-		tmp._frac = to_string(str_frac);
-		tmp._n = n;
-		INFO("after split : " << tmp._int << ", " << tmp._frac << ", " << tmp._n);
-		big_data.push_back(tmp);// push into big_data
+		// locationing where to remove prefix 0
+		int start = 0;	
+		while (start < data.length && data.at(start) == 0)
+			++start;
+		// locationing where to remove suffix 0 (when fractional)
+		int end = data.length() - 1;
+		int pos = data.find('.');
+		if (pos != -1) {
+			while (end >= 0 && data.at(end) == '0')
+				--end;
+		}
+		// get valid data
+		data = data.substr(start, end - start + 1);
+		// remove decimal point and mark the length of fractional part of result
+		pos = data.find('.');
+		if (pos != -1) {
+			data.erase(pos, 1);
+			pos = times * (data.length);//???
+		}
+
 	}
 }
 
-/* Process the big_data, in this case it is exponential operation  */
-void procData(vector<BIG_DATA_t> & big_data)
+/* Check the big_data */
+void checkData(vector<INPUT_DATA_t> & input_data)
 {
-	for (vector<BIG_DATA_t>::iterator iter = big_data.begin(); iter < big_data.end(); ++iter)
+	INFO("\nCheck input data:");
+	for (vector<INPUT_DATA_t>::iterator iter = input_data.begin(); iter < input_data.end(); ++iter)
 	{
+		INFO((*iter).data << ", " << (*iter).fracNum << ", " << (*iter).times);
+	}
+}
 
+void mulBigdata(string & _int, string & _frac, int & _fracNum)
+{
+
+}
+
+void expBigdata(string & data, int times)
+{
+	if (times == 1)
+		return;
+	
+}
+
+/* Process the big_data, in this case it is exponential operation  */
+void procData(vector<INPUT_DATA_t> & input_data, vector<OUTPUT_DATA_t> & output_data)
+{
+	int data_length = input_data.size();
+	for (int i = 0; i < data_length; ++i)
+	{
+		OUTPUT_DATA_t	tmp;
+		tmp.data = input_data[i].data;
+		int times = input_data[i].times;
+		tmp.fracNum = input_data[i].fracNum * times;
+		if (times <= 0)
+		{
+			INFO("WARNING: the expNum of input data is not an integer such that 0 < expNum <= 25.")
+		}			
+		else
+		{
+			expBigdata(tmp.data, times);
+		}		
+		output_data.push_back(tmp);//push the calculation result into vector output_result
+	}
+}
+
+/* Print the result */
+void printResult(vector<OUTPUT_DATA_t> & output_result)
+{
+	INFO("\nResult:");
+	int data_length = output_result.size();
+	for (int i = 0; i < data_length; ++i)
+	{
+		INFO("");
 	}
 }
 
@@ -61,9 +119,13 @@ void procData(vector<BIG_DATA_t> & big_data)
 /* Main function */
 int main()
 {
-	vector<BIG_DATA_t> big_data;// to contain all input data
-	getData(big_data);// get input data and split
-	//procData(big_data);// calculate the result
+	vector<INPUT_DATA_t> input_data;// to contain all input data
+	vector<OUTPUT_DATA_t> big_data;// to contain all result data, i.e. big data, i.e. string
+
+	getData(input_data);// get input
+	checkData(input_data);// check input 
+	procData(input_data, big_data);// calculate result
+	printResult(big_data);// print result
 
 	return 0;
 }
