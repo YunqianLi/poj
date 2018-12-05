@@ -53,7 +53,7 @@ void getData(vector<INPUT_DATA_t > & input_data)
 		// remove prefix 0
 		int start = 0;
 		while ((start < in_data.data.length()) && (in_data.data.at(start) == '0'))
-			++start;		
+			++start;
 		in_data.data = in_data.data.substr(start, in_data.data.length() - start);
 		// reverse data to compute more easily
 		std::reverse(in_data.data.begin(), in_data.data.end());
@@ -75,25 +75,81 @@ void checkData(vector<INPUT_DATA_t> & input_data)
 	}
 }
 
-std::string & mulBigdata(const std::string & multiplicand, const std::string & multiplier)
+/* Bigdata's multiply operation */
+std::string mulBigdata(const std::string & multiplicand, const std::string & multiplier)
 {
 	string product;
 	// simplify: multiplicand->m, multiplier->n, only if len1 >= len2
-	const string* m = &multiplicand;
-	const string* n = &multiplier;
+	const string* mStr = &multiplicand;
+	const string* nStr = &multiplier;
 	if (multiplicand.length() < multiplier.length())
 	{// exchange m and n, if len1<len2
-		m = &multiplier;
-		n = &multiplicand;
+		mStr = &multiplier;
+		nStr = &multiplicand;
 	}
-	for (int i = 0; i < n->length(); ++i)
+	// use int[] array to hold the mStr string
+	int mLen = mStr->length();
+	int nLen = nStr->length();
+	int *m = new int(mLen);
+	int *n = new int(nLen);
+	for (int i = 0; i < mLen; ++i)
 	{
-		
+		m[i] = mStr->at(i) - '0';
 	}
-
+	for (int i = 0; i < nLen; ++i)
+	{
+		n[i] = nStr->at(i) - '0';
+	}
+	// mainloop to compute product
+	int p = m[0] * n[0] % 10;//p->product,
+	product.push_back(p + '0');// product[0]
+	int c1 = m[0] * n[0] / 10;//c1->inherent_carrier = m[i]*n[j]/10
+	int c2 = 0;//c2->accumulate_carrier = sum( m(i)*n(j)%10 )
+	for (int i = 1; i < mLen + nLen - 1; ++i)
+	{// product[1, mLen+nLen-2]
+		p = 0;
+		int c1_new = 0;
+		if (i < nLen - 1)
+		{// product[1, nlen-2]
+			for (int j = 0; j <= i; ++j)
+			{
+				p += n[j] * m[i - j] % 10;
+				c1_new += n[j] * m[i - j] / 10;
+			}
+		}
+		else if (i >= nLen - 1 && i < mLen)
+		{// [nlen-1, mLen-1]
+			for (int j = 0; j < nLen; ++j)
+			{
+				p += n[j] * m[i - j] % 10;
+				c1_new += n[j] * m[i - j] / 10;
+			}
+		}
+		else if (i >= mLen)
+		{// product[mLen, mLen+nLen-2]
+			for (int j = mLen; j >= i - nLen + 1; --j)
+			{
+				p += m[j] * n[i - j] % 10;
+				c1_new += m[j] * n[i - j] / 10;
+			}
+		}
+		p += c1 + c2;
+		c2 = p / 10;
+		p = p % 10;
+		c1 = c1_new;
+		product.push_back(p + '0');
+	}
+	if (c1 + c2 > 0)
+	{// product[mLen+nLen-1]
+		product.push_back(c1 + c2 + '0');
+	}
+	// release array
+	delete m;
+	delete n;
+	// return result
 	return product;
 }
-
+/* Bigdata's exponetiation operation */
 void expBigdata(std::string & data, int times)
 {
 	if (times == 1)
@@ -103,7 +159,7 @@ void expBigdata(std::string & data, int times)
 	for (int i = 0; i < times; ++i)
 	{
 		result = mulBigdata(result, data);// multiply iteratively
-	}	
+	}
 	data = result;
 	/* TODO: reduce the number of multiply operations */
 	//if (times % 2 == 0)
@@ -116,17 +172,17 @@ void expBigdata(std::string & data, int times)
 	//}
 }
 
+/* Move decimal point based on the fracNum to get the right result */
 void mvDecimalPoint(std::string & bigdata, int fracNum)
 {
 	if (bigdata.length() >= fracNum)
 	{
-		bigdata.insert(fracNum,".");
+		bigdata.insert(fracNum, ".");
 	}
 	else
 	{
-		std::string zeroStr(fracNum - bigdata.length(), '0');
-		zeroStr.append(".");
-		bigdata.append(zeroStr);
+		bigdata.append(fracNum - bigdata.length(), '0');
+		bigdata.append(".");
 	}
 	std::reverse(bigdata.begin(), bigdata.end());
 }
@@ -136,7 +192,7 @@ void procData(vector<INPUT_DATA_t> & input_data, vector<std::string> & output_da
 {
 	string	bigdata;
 	for (vector<INPUT_DATA_t>::iterator iter = input_data.begin(); iter < input_data.end(); ++iter)
-	{		
+	{
 		if (iter->times <= 0)
 		{
 			INFO("WARNING: the expNum of input data is not an integer such that 0 < expNum <= 25.");
@@ -162,25 +218,16 @@ void printResult(vector<std::string> & output_data)
 	}
 }
 
-string& tempTset()
-{
-	string tmp = "hello";
-	return tmp;
-}
-
 /* Main function */
 int main()
 {
 	vector<INPUT_DATA_t> input_data;// to contain all input data
 	vector<std::string> big_data;// to contain all result data, i.e. big data, i.e. string
 
-	//getData(input_data);// get input
-	//checkData(input_data);// check input 
-	//procData(input_data, big_data);// calculate result
-	//printResult(big_data);// print result
-
-	string tmp;
-	tmp = tempTset();
+	getData(input_data);// get input
+	checkData(input_data);// check input 
+	procData(input_data, big_data);// calculate result
+	printResult(big_data);// print result
 
 	return 0;
 }
