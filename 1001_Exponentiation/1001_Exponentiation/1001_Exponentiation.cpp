@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+//#include<Psapi.h>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ using namespace std;
 /* Debug-Macro */
 #ifdef DEBUG
 #include <time.h>
-#define INFO(str) std::cout << str << std::endl;
+#define INFO(str) std::cout << "<LINE" << __LINE__ << "> " << str << std::endl;
 #else
 #define INFO(str) 
 #endif
@@ -69,14 +70,19 @@ void getData(vector<INPUT_DATA_t > & input_data)
 /* Check the input data */
 void checkData(vector<INPUT_DATA_t> & input_data)
 {
-	INFO("\nCheck input data:");
+	INFO("Check input data:");
 	for (vector<INPUT_DATA_t>::iterator iter = input_data.begin(); iter < input_data.end(); ++iter)
 	{
 		INFO((*iter).data << ", " << (*iter).fracNum << ", " << (*iter).times);
 	}
 }
 
-/* Bigdata's multiply operation */
+/* Bigdata's multiply operation 
+* for example: 123 x 45 = 5535
+* in this case: multiplicand is "321" and multiplier is "54"
+* and the result should be "5355"
+* so the input and ouput must be reverse to pirnt the right result.
+*/
 std::string mulBigdata(const std::string & multiplicand, const std::string & multiplier)
 {
 	string product;
@@ -248,5 +254,11 @@ int main()
 	std::cout << "\nTime cost is " << dur * 1000 << "ms. ";
 	std::cout << "Program exit." << std::endl;
 #endif
+//#pragma comment(lib,"Psapi.lib")
+//	HANDLE handle = GetCurrentProcess();
+//	PROCESS_MEMORY_COUNTERS pmc;
+//	GetProcessMemoryInfo(handle, &pmc, sizeof(pmc));
+//	printf("%d\r\n", pmc.WorkingSetSize);  //结果保存单位是B，可以除以1000保存为kb格式
+
 	return 0;
 }
