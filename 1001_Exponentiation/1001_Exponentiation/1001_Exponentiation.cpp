@@ -6,14 +6,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 #define DEBUG
-//#define ONLINE_JUDGE
 
 /* Debug-Macro */
 #ifdef DEBUG
+#include <time.h>
 #define INFO(str) std::cout << str << std::endl;
 #else
 #define INFO(str) 
@@ -30,7 +31,7 @@ struct INPUT_DATA_t {
 /* Get and parse input data */
 void getData(vector<INPUT_DATA_t > & input_data)
 {
-#ifndef ONLINE_JUDGE
+#ifdef DEBUG
 	freopen("./sample_input.txt", "r", stdin);// to debug locally
 #endif
 	INPUT_DATA_t in_data;
@@ -56,11 +57,11 @@ void getData(vector<INPUT_DATA_t > & input_data)
 			++start;
 		in_data.data = in_data.data.substr(start, in_data.data.length() - start);
 		// reverse data to compute more easily
-		std::reverse(in_data.data.begin(), in_data.data.end());
+		reverse(in_data.data.begin(), in_data.data.end());
 		// push into input_data
 		input_data.push_back(in_data);
 	}
-#ifndef ONLINE_JUDGE
+#ifdef DEBUG
 	fclose(stdin);// to debug locally
 #endif
 }
@@ -90,8 +91,8 @@ std::string mulBigdata(const std::string & multiplicand, const std::string & mul
 	// use int[] array to hold the mStr string
 	int mLen = mStr->length();
 	int nLen = nStr->length();
-	int *m = new int(mLen);
-	int *n = new int(nLen);
+	int *m = new int[mLen];
+	int *n = new int[nLen];
 	for (int i = 0; i < mLen; ++i)
 	{
 		m[i] = mStr->at(i) - '0';
@@ -127,7 +128,7 @@ std::string mulBigdata(const std::string & multiplicand, const std::string & mul
 		}
 		else if (i >= mLen)
 		{// product[mLen, mLen+nLen-2]
-			for (int j = mLen; j >= i - nLen + 1; --j)
+			for (int j = mLen - 1; j >= i - nLen + 1; --j)
 			{
 				p += m[j] * n[i - j] % 10;
 				c1_new += m[j] * n[i - j] / 10;
@@ -144,11 +145,12 @@ std::string mulBigdata(const std::string & multiplicand, const std::string & mul
 		product.push_back(c1 + c2 + '0');
 	}
 	// release array
-	delete m;
-	delete n;
+	delete[]m;
+	delete[]n;
 	// return result
 	return product;
 }
+
 /* Bigdata's exponetiation operation */
 void expBigdata(std::string & data, int times)
 {
@@ -156,7 +158,7 @@ void expBigdata(std::string & data, int times)
 		return;
 	std::string result;
 	result = data;
-	for (int i = 0; i < times; ++i)
+	for (int i = 0; i < times - 1; ++i)
 	{
 		result = mulBigdata(result, data);// multiply iteratively
 	}
@@ -175,16 +177,19 @@ void expBigdata(std::string & data, int times)
 /* Move decimal point based on the fracNum to get the right result */
 void mvDecimalPoint(std::string & bigdata, int fracNum)
 {
-	if (bigdata.length() >= fracNum)
+	if (fracNum)
 	{
-		bigdata.insert(fracNum, ".");
+		if (bigdata.length() >= fracNum)
+		{
+			bigdata.insert(fracNum, ".");
+		}
+		else
+		{
+			bigdata.append(fracNum - bigdata.length(), '0');
+			bigdata.append(".");
+		}
 	}
-	else
-	{
-		bigdata.append(fracNum - bigdata.length(), '0');
-		bigdata.append(".");
-	}
-	std::reverse(bigdata.begin(), bigdata.end());
+	reverse(bigdata.begin(), bigdata.end());
 }
 
 /* Process the big_data, in this case it is exponential operation  */
@@ -214,7 +219,7 @@ void printResult(vector<std::string> & output_data)
 	INFO("\nResult:");
 	for (vector<std::string>::iterator iter = output_data.begin(); iter < output_data.end(); ++iter)
 	{
-		INFO((*iter));
+		std::cout << *iter << std::endl;
 	}
 }
 
@@ -225,9 +230,23 @@ int main()
 	vector<std::string> big_data;// to contain all result data, i.e. big data, i.e. string
 
 	getData(input_data);// get input
+#ifdef DEBUG
 	checkData(input_data);// check input 
+#endif
+
+#ifdef DEBUG
+	clock_t begin, end;
+	begin = clock();
+#endif
+
 	procData(input_data, big_data);// calculate result
 	printResult(big_data);// print result
 
+#ifdef DEBUG
+	end = clock();
+	double dur = double(end - begin) / CLOCKS_PER_SEC;
+	std::cout << "\nTime cost is " << dur * 1000 << "ms. ";
+	std::cout << "Program exit." << std::endl;
+#endif
 	return 0;
 }
