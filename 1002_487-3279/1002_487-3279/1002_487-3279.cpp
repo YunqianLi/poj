@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <string>
 #include <time.h>
 #include <algorithm>
@@ -41,9 +42,7 @@ void checkData(vector<std::string> & telNum)
 {
 	INFO("Check input data:");
 	for (vector<std::string>::iterator iter = telNum.begin(); iter < telNum.end(); ++iter)
-	{
 		INFO((*iter));
-	}
 }
 
 /* Transform format to standard */
@@ -51,58 +50,53 @@ void fmtTransform(std::string & str)
 {
 	for (int i = 0; i < str.length(); ++i)
 	{
-		switch (str.at(i))
+		switch (str[i])
 		{
 		case 'A':
 		case 'B':
 		case 'C':
-			str.at(i) = '2';
+			str[i] = '2';
 			break;
 		case 'D':
 		case 'E':
 		case 'F':
-			str.at(i) = '3';
+			str[i] = '3';
 			break;
 		case 'G':
 		case 'H':
 		case 'I':
-			str.at(i) = '4';
+			str[i] = '4';
 			break;
 		case 'J':
 		case 'K':
 		case 'L':
-			str.at(i) = '5';
+			str[i] = '5';
 			break;
 		case 'M':
 		case 'N':
 		case 'O':
-			str.at(i) = '6';
+			str[i] = '6';
 			break;
 		case 'P':
 		case 'R':
 		case 'S':
-			str.at(i) = '7';
+			str[i] = '7';
 			break;
 		case 'T':
 		case 'U':
 		case 'V':
-			str.at(i) = '8';
+			str[i] = '8';
 			break;
 		case 'W':
 		case 'X':
 		case 'Y':
-			str.at(i) = '9';
+			str[i] = '9';
 			break;
 		default: break;
 		}
 	}
 }
 
-/* Sort output result by ascending for output */
-void ascendSort(vector<std::string> & output_data)
-{
-
-}
 
 /* Process the input data
 * first, delete "-"
@@ -112,13 +106,14 @@ void ascendSort(vector<std::string> & output_data)
 */
 void procData(vector<std::string> & input_data, vector<std::string> & output_data)
 {
-	if (input_data.size() == 1)
-	{
+	// deal with special case
+	if (input_data.size() == 1)	{
 		output_data.push_back("No duplicates.");
 		return;
 	}
+	// common case
 	for (vector<std::string>::iterator iter = input_data.begin(); iter < input_data.end(); ++iter)
-	{		
+	{
 		// delete "-"
 		iter->erase(std::remove(iter->begin(), iter->end(), '-'), iter->end());
 		// transform to standard format
@@ -132,33 +127,37 @@ void procData(vector<std::string> & input_data, vector<std::string> & output_dat
 	int validNum = input_data.size();
 	while (validNum > 1)
 	{
-		string base = input_data.begin;
-		for (vector<std::string>::iterator iter = input_data.begin(); iter < input_data.end(); ++iter)
+		string base = input_data.front();
+		int times = 0;
+		vector<std::string>::iterator iter = input_data.begin();
+		for (; iter != input_data.end();)
 		{
-			output_data.push_back(*iter);
+			if (base.compare(*iter) == 0){// if same, times++ and erase it
+				iter = input_data.erase(iter);
+				++times;
+			}else
+				++iter;
 		}
+		if (times > 1)// if repeat, push into output_data
+			output_data.push_back(base + " " + std::to_string(times));
+		validNum = input_data.size();// update validNum for while-loop
 	}
 	if (output_data.size())
-	{
-		// sort by ascending
-		ascendSort(output_data);
-	}
+	    // sort by ascending(default of sort, descending is std::greater<std::string>() )
+		std::sort(output_data.begin(), output_data.end());
 	else
-	{
-		output_data.push_back("No duplicates.")
-	}
+		output_data.push_back("No duplicates.");
 }
 
 /* Print the result */
 void printResult(vector<std::string> & output_data)
 {
+#ifdef DEBUG
 	INFO("\nResult:");
+#endif
 	for (vector<std::string>::iterator iter = output_data.begin(); iter < output_data.end(); ++iter)
-	{
 		std::cout << *iter << std::endl;
-	}
 }
-
 
 /* Main function */
 int main()
@@ -177,7 +176,7 @@ int main()
 #endif
 
 	procData(input_data, output_data);
-	//printResult(output_data);
+	printResult(output_data);
 
 #ifdef DEBUG
 	end = clock();
@@ -186,16 +185,5 @@ int main()
 	std::cout << "Program exit." << std::endl;
 #endif
 
-	//string str = "1a2b";
-	//for (int i = 0; i < 4; ++i)
-	//{
-	//	switch (str.at(i))
-	//	{
-	//	case 'a':
-	//	case 'b':
-	//		str.at(i) = 'P';
-	//	}
-	//}
-	//INFO(str);
 	return 0;
 }
